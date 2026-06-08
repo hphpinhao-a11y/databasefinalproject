@@ -170,5 +170,43 @@
       }
     ],
     "exclusions": "Delays caused by third-party events (extreme weather, security incidents, government directives, or passenger-caused incidents) are not eligible for compensation."
+  },
+  {
+    "policy_id": "RF006",
+    "label": "National Rail – Monthly / Season Pass",
+    "applies_to": {
+      "network_type": "national_rail",
+      "ticket_types": ["monthly_pass", "season_pass"]
+    },
+    "refund_model": "pro_rated_by_unused_days",
+    "refund_formula": "refund = pass_price × (full unused days remaining ÷ total validity days) − admin_fee_usd",
+    "cancellation_windows": [
+      {
+        "window_id": "RF006_W1",
+        "label": "Refund before activation",
+        "condition": "Cancellation requested before the pass validity start date, while the pass has not yet been activated",
+        "status_condition": "Booking status is 'confirmed' and the validity period has not started",
+        "refund_percent": 100,
+        "admin_fee_usd": 5.00
+      },
+      {
+        "window_id": "RF006_W2",
+        "label": "Pro-rated refund after activation",
+        "condition": "Cancellation requested after the validity period has started but before it ends. The refund is calculated on the number of full unused days remaining on the pass.",
+        "status_condition": "Booking status is 'confirmed' and the validity end date has not passed",
+        "refund_percent": "pro_rated",
+        "refund_calculation": "refund = pass_price × (full unused days remaining ÷ total validity days), minus the administration fee. Partial days are not refunded; the day on which cancellation is requested counts as a used day.",
+        "admin_fee_usd": 5.00
+      },
+      {
+        "window_id": "RF006_W3",
+        "label": "No refund",
+        "condition": "Cancellation requested on or after the validity end date, or the pass has otherwise expired",
+        "status_condition": "Booking status is 'completed' or the validity period has ended",
+        "refund_percent": 0,
+        "admin_fee_usd": 0.00
+      }
+    ],
+    "notes": "Monthly and season passes are non-transferable. The pro-rated refund is based on whole unused days only and does not depend on how many journeys were actually taken. A single administration fee of $5.00 is deducted per refund. The administration fee is waived only when the operator cancels the pass or the refund arises from operator fault (see RF008)."
   }
 ]
