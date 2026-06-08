@@ -208,5 +208,62 @@
       }
     ],
     "notes": "Monthly and season passes are non-transferable. The pro-rated refund is based on whole unused days only and does not depend on how many journeys were actually taken. A single administration fee of $5.00 is deducted per refund. The administration fee is waived only when the operator cancels the pass or the refund arises from operator fault (see RF008)."
+  },
+  {
+    "policy_id": "RF007",
+    "label": "National Rail – Group Booking (10+ tickets)",
+    "applies_to": {
+      "network_type": "national_rail",
+      "booking_type": "group",
+      "ticket_types": ["single", "return"],
+      "condition": "Applies to group bookings of 10 or more tickets purchased in a single transaction (see group_fares in booking rules). Group cancellation terms are stricter than the standard single/return policy because seats are held in bulk."
+    },
+    "cancellation_windows": [
+      {
+        "window_id": "RF007_W1",
+        "label": "Early cancellation",
+        "condition": "Cancellation requested 72 or more hours before scheduled departure",
+        "hours_before_departure_min": 72,
+        "hours_before_departure_max": null,
+        "refund_percent": 90,
+        "admin_fee_usd": 1.00
+      },
+      {
+        "window_id": "RF007_W2",
+        "label": "Standard cancellation",
+        "condition": "Cancellation requested between 48 and 72 hours before scheduled departure",
+        "hours_before_departure_min": 48,
+        "hours_before_departure_max": 72,
+        "refund_percent": 50,
+        "admin_fee_usd": 1.00
+      },
+      {
+        "window_id": "RF007_W3",
+        "label": "Late cancellation",
+        "condition": "Cancellation requested between 24 and 48 hours before scheduled departure",
+        "hours_before_departure_min": 24,
+        "hours_before_departure_max": 48,
+        "refund_percent": 25,
+        "admin_fee_usd": 1.00
+      },
+      {
+        "window_id": "RF007_W4",
+        "label": "No refund",
+        "condition": "Cancellation requested less than 24 hours before departure, or after departure time has passed",
+        "hours_before_departure_min": 0,
+        "hours_before_departure_max": 24,
+        "refund_percent": 0,
+        "admin_fee_usd": 0.00
+      }
+    ],
+    "admin_fee_note": "The administration fee of $1.00 is charged per cancelled ticket, not per booking.",
+    "partial_cancellation": {
+      "allowed": true,
+      "description": "A group booking may cancel some tickets while keeping the rest. Each cancelled ticket is refunded according to the window above, based on the time before departure when the cancellation is requested.",
+      "below_minimum_rule": "If partial cancellations reduce the number of remaining travelling passengers below the group minimum of 10, the 10% group discount no longer applies. The remaining tickets are recalculated at the full standard fare, and the difference is deducted from the refund being issued.",
+      "full_group_cancellation": "Cancelling the entire group is treated as cancelling every ticket at once and each ticket is refunded under the applicable window."
+    },
+    "no_show_policy": "Group members who do not travel and were not cancelled in advance are treated as no-shows. No refund is issued for no-shows.",
+    "notes": "Group cancellation terms are deliberately stricter than RF001 because bulk-held seats block availability for other passengers. The reference single/return policy is RF001 (normal) / RF002 (express); RF007 overrides those windows for group bookings."
   }
 ]
