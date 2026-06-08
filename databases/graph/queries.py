@@ -139,28 +139,55 @@ def query_interchange_path(origin_id: str, destination_id: str) -> dict:
 
 # ── DELAY RIPPLE ANALYSIS ─────────────────────────────────────────────────────
 
-def query_delay_ripple(delayed_station_id: str, hops: int = 2) -> list[dict]:
-    """
-    Find all stations within N hops of a delayed or disrupted station.
-    Works on both metro and national rail networks.
+def query_delay_ripple(
+    delayed_station_id: str,
+    hops: int = 2
+) -> list[dict]:
 
-    Args:
-        delayed_station_id: e.g. "NR03" or "MS01"
-        hops:               how many connections out to search (default 2)
+    with _driver() as driver:
+        with driver.session() as session:
 
-    Returns:
-        List of dicts: {station_id, name, hops_away, lines_affected}
-    """
-    raise NotImplementedError("TODO: implement after designing your graph schema")
+            result = session.run(
+                f"""
+                MATCH (s {{station_id:$station_id}})
+
+                MATCH p=(s)-[:CONNECTS_TO*1..{hops}]->(n)
+
+                WHERE n.station_id <> $station_id
+
+                RETURN DISTINCT
+                    n.station_id AS station_id,
+                    n.name AS name,
+                    length(p) AS hops_away
+
+                ORDER BY hops_away
+                """,
+                station_id=delayed_station_id
+            )
+
+            return [dict(record) for record in result]
 
 
 # ── STATION CONNECTIONS ───────────────────────────────────────────────────────
 
 def query_station_connections(station_id: str) -> list[dict]:
-    """
-    List all direct connections from a given station.
 
-    Args:
-        station_id: e.g. "MS01" or "NR01"
-    """
-    raise NotImplementedError("TODO: implement after designing your graph schema")
+    with _driver() as driver:
+        with driver.session() as session:
+
+            result = session.run(
+                """
+                MATCH (s {station_id:$station_id})
+                      -[r:CONNECTS_TO]->
+                      (n)
+
+                RETURN
+                    n.station_id AS station_id,
+                    n.name AS name,
+                    r.line AS line,
+                    r.travel_time_min AS travel_time_min
+                """,
+                station_id=station_id
+            )
+
+            return [dict(record) for record in result]

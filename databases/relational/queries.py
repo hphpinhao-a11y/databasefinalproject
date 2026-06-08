@@ -74,16 +74,67 @@ def query_national_rail_availability(
     destination_id: str,
     travel_date: Optional[str] = None,
 ) -> list[dict]:
-    """
-    Return national rail schedules that serve both origin and destination stations
-    in the correct order, along with seat occupancy for the requested travel date.
 
-    Args:
-        origin_id:       e.g. "NR01"
-        destination_id:  e.g. "NR05"
-        travel_date:     e.g. "2025-06-01" — used to count bookings; omit for general info
-    """
-    raise NotImplementedError("TODO: implement after designing your schema")
+    with _connect() as conn:
+        with conn.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor
+        ) as cur:
+
+            cur.execute(
+                """
+                SELECT
+                    ns.*,
+
+                    o.stop_order AS origin_order,
+                    d.stop_order AS destination_order,
+
+                    (d.stop_order - o.stop_order)
+                        AS stops_travelled
+
+                FROM national_rail_schedules ns
+
+                JOIN national_rail_schedule_stops o
+                    ON ns.schedule_id = o.schedule_id
+
+                JOIN national_rail_schedule_stops d
+                    ON ns.schedule_id = d.schedule_id
+
+                WHERE o.station_id = %s
+                  AND d.station_id = %s
+                  AND o.stop_order < d.stop_order
+
+                ORDER BY ns.schedule_id
+                """,
+                (origin_id, destination_id)
+            )
+
+            schedules = [
+                dict(row)
+                for row in cur.fetchall()
+            ]
+
+            if not travel_date:
+                return schedules
+
+            for sched in schedules:
+
+                cur.execute(
+                    """
+                    SELECT COUNT(*)
+                    FROM national_rail_bookings
+                    WHERE schedule_id = %s
+                      AND travel_date = %s
+                      AND status <> 'cancelled'
+                    """,
+                    (
+                        sched["schedule_id"],
+                        travel_date
+                    )
+                )
+
+                sched["booked_seats"] = cur.fetchone()["count"]
+
+            return schedules
 
 
 def query_national_rail_fare(
@@ -91,45 +142,110 @@ def query_national_rail_fare(
     fare_class: str,
     stops_travelled: int,
 ) -> Optional[dict]:
-    """
-    Calculate the fare for a national rail journey.
 
-    Args:
-        schedule_id:     e.g. "NR_SCH01"
-        fare_class:      "standard" or "first"
-        stops_travelled: number of stops between origin and destination (inclusive)
+    with _connect() as conn:
+        with conn.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor
+        ) as cur:
 
-    Returns:
-        dict with fare_class, base_fare_usd, per_stop_rate_usd, total_fare_usd
-    """
-    raise NotImplementedError("TODO: implement after designing your schema")
+            cur.execute(
+                """
+                SELECT
+                    schedule_id,
+                    fare_class,
+                    base_fare_usd,
+                    per_stop_rate_usd
+                FROM national_rail_fares
+                WHERE schedule_id = %s
+                AND fare_class = %s
+                """,
+                (schedule_id, fare_class)
+            )
+
+            row = cur.fetchone()
+
+            if not row:
+                return None
+
+            result = dict(row)
+
+            result["total_fare_usd"] = (
+                float(result["base_fare_usd"])
+                + float(result["per_stop_rate_usd"]) * stops_travelled
+            )
+
+            return result
 
 
 # ── METRO SCHEDULES & FARE ────────────────────────────────────────────────────
 
 def query_metro_schedules(origin_id: str, destination_id: str) -> list[dict]:
-    """
-    Return metro schedules that serve both origin and destination in the correct order.
 
-    Args:
-        origin_id:       e.g. "MS01"
-        destination_id:  e.g. "MS09"
-    """
-    raise NotImplementedError("TODO: implement after designing your schema")
+    with _connect() as conn:
+        with conn.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor
+        ) as cur:
+
+            cur.execute(
+                """
+                SELECT
+                    ms.*,
+                    o.stop_order AS origin_order,
+                    d.stop_order AS destination_order,
+                    (d.stop_order - o.stop_order) AS stops_travelled
+
+                FROM metro_schedules ms
+
+                JOIN metro_schedule_stops o
+                    ON ms.schedule_id = o.schedule_id
+
+                JOIN metro_schedule_stops d
+                    ON ms.schedule_id = d.schedule_id
+
+                WHERE o.station_id = %s
+                  AND d.station_id = %s
+                  AND o.stop_order < d.stop_order
+
+                ORDER BY ms.schedule_id
+                """,
+                (origin_id, destination_id)
+            )
+
+            return [dict(row) for row in cur.fetchall()]
 
 
 def query_metro_fare(schedule_id: str, stops_travelled: int) -> Optional[dict]:
-    """
-    Calculate the metro fare for a single-ticket journey.
 
-    Args:
-        schedule_id:     e.g. "MS_SCH01"
-        stops_travelled: number of stops between origin and destination
+    with _connect() as conn:
+        with conn.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor
+        ) as cur:
 
-    Returns:
-        dict with base_fare_usd, per_stop_rate_usd, total_fare_usd
-    """
-    raise NotImplementedError("TODO: implement after designing your schema")
+            cur.execute(
+                """
+                SELECT
+                    schedule_id,
+                    base_fare_usd,
+                    per_stop_rate_usd
+                FROM metro_schedules
+                WHERE schedule_id = %s
+                """,
+                (schedule_id,)
+            )
+
+            row = cur.fetchone()
+
+            if not row:
+                return None
+
+            result = dict(row)
+
+            result["total_fare_usd"] = (
+                float(result["base_fare_usd"])
+                + float(result["per_stop_rate_usd"]) * stops_travelled
+            )
+
+            return result
 
 
 # ── SEAT SELECTION ────────────────────────────────────────────────────────────
@@ -139,18 +255,52 @@ def query_available_seats(
     travel_date: str,
     fare_class: str,
 ) -> list[dict]:
-    """
-    Return available seats for a national rail journey on a given date.
 
-    Args:
-        schedule_id:  e.g. "NR_SCH01"
-        travel_date:  e.g. "2025-06-01"
-        fare_class:   "standard" or "first"
+    with _connect() as conn:
+        with conn.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor
+        ) as cur:
 
-    Returns:
-        List of dicts: {seat_id, coach, row, column}
-    """
-    raise NotImplementedError("TODO: implement after designing your schema")
+            cur.execute(
+                """
+                SELECT
+                    s.seat_id,
+                    s.coach,
+                    s.row_no AS row,
+                    s.column_no AS column
+
+                FROM national_rail_seats s
+
+                JOIN national_rail_seat_layouts l
+                    ON s.layout_id = l.layout_id
+
+                WHERE l.schedule_id = %s
+                  AND s.fare_class = %s
+
+                  AND s.seat_id NOT IN (
+
+                        SELECT seat_id
+                        FROM national_rail_bookings
+
+                        WHERE schedule_id = %s
+                          AND travel_date = %s
+                          AND status <> 'cancelled'
+                  )
+
+                ORDER BY
+                    s.coach,
+                    s.row_no,
+                    s.column_no
+                """,
+                (
+                    schedule_id,
+                    fare_class,
+                    schedule_id,
+                    travel_date
+                )
+            )
+
+            return [dict(row) for row in cur.fetchall()]
 
 
 def auto_select_adjacent_seats(available_seats: list[dict], count: int) -> list[str]:
@@ -182,9 +332,60 @@ def auto_select_adjacent_seats(available_seats: list[dict], count: int) -> list[
 
 # ── USER & BOOKING QUERIES ────────────────────────────────────────────────────
 
-def query_user_profile(user_email: str) -> Optional[dict]:
-    """Return a user's profile by email."""
-    raise NotImplementedError("TODO: implement after designing your schema")
+def query_user_bookings(user_email: str) -> dict:
+
+    with _connect() as conn:
+        with conn.cursor(
+            cursor_factory=psycopg2.extras.RealDictCursor
+        ) as cur:
+
+            cur.execute(
+                """
+                SELECT user_id
+                FROM users
+                WHERE email = %s
+                """,
+                (user_email,)
+            )
+
+            user = cur.fetchone()
+
+            if not user:
+                return {
+                    "national_rail": [],
+                    "metro": []
+                }
+
+            user_id = user["user_id"]
+
+            cur.execute(
+                """
+                SELECT *
+                FROM national_rail_bookings
+                WHERE user_id = %s
+                ORDER BY booked_at DESC
+                """,
+                (user_id,)
+            )
+
+            rail_bookings = [dict(row) for row in cur.fetchall()]
+
+            cur.execute(
+                """
+                SELECT *
+                FROM metro_travel_history
+                WHERE user_id = %s
+                ORDER BY purchased_at DESC
+                """,
+                (user_id,)
+            )
+
+            metro_bookings = [dict(row) for row in cur.fetchall()]
+
+            return {
+                "national_rail": rail_bookings,
+                "metro": metro_bookings
+            }
 
 
 def query_user_bookings(user_email: str) -> dict:
