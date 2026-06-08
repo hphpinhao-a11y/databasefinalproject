@@ -175,6 +175,27 @@
       "Items emitting strong odours that may cause discomfort to other passengers"
     ],
     "smoking_and_vaping": "Strictly prohibited on all train carriages and at all station platforms.",
+    "wifi_and_power": {
+      "onboard_wifi": {
+        "available": true,
+        "network_name": "TransitFlow_Rail_WiFi",
+        "standard_class": {
+          "fee_usd": 2.00,
+          "description": "Wi-Fi is available in standard class for a flat fee of $2.00 per journey. Connect to 'TransitFlow_Rail_WiFi' and pay via the sign-in page. A data fair-use limit applies; streaming may be throttled."
+        },
+        "first_class": {
+          "fee_usd": 0.00,
+          "description": "Wi-Fi is included free of charge in first class. Connect to 'TransitFlow_Rail_WiFi'; first class tickets are recognised automatically or via the seat code shown at the seat."
+        },
+        "coverage": "Wi-Fi is provided via mobile networks along the route and may slow down or drop in tunnels and remote areas."
+      },
+      "power_sockets": {
+        "standard_class": "Standard class seats have a shared power socket (one per pair of seats) and a USB-A charging port at most seats.",
+        "first_class": "First class seats each have an individual power socket and both USB-A and USB-C charging ports.",
+        "notes": "Passengers should bring their own charging cables. Sockets supply standard mains voltage."
+      },
+      "mobile_signal": "Mobile data signal is generally available along the route but may be intermittent in tunnels and rural sections."
+    },
     "conduct": "Passengers behaving in a manner that causes distress or danger to other passengers or staff may be removed from the train. In serious cases, the operator reserves the right to involve law enforcement."
   }
 }
