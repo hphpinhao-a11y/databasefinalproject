@@ -196,6 +196,20 @@
       },
       "mobile_signal": "Mobile data signal is generally available along the route but may be intermittent in tunnels and rural sections."
     },
-    "conduct": "Passengers behaving in a manner that causes distress or danger to other passengers or staff may be removed from the train. In serious cases, the operator reserves the right to involve law enforcement."
+    "conduct": "Passengers behaving in a manner that causes distress or danger to other passengers or staff may be removed from the train. In serious cases, the operator reserves the right to involve law enforcement.",
+    "large_groups": {
+      "definition": "A large group is 10 or more passengers travelling together on the same service. Group fares and group cancellation terms are covered separately (see group_fares in the booking rules and refund policy RF007); this section covers conduct and travel arrangements for groups.",
+      "advance_notification": {
+        "required_threshold": 10,
+        "notice_period": "Groups of 10 or more are asked to notify the operator at least 48 hours before travel, even when tickets are already booked, so staff can plan seating and boarding.",
+        "how_to_notify": "Notify via customer service or the group booking confirmation. For very large groups (30+), the operator may ask to confirm the specific service to avoid overcrowding a single train.",
+        "purpose": "Advance notice helps allocate seats together where possible, arrange platform assistance, and ensure the chosen service has capacity."
+      },
+      "seating": "Group seats are allocated together where capacity allows, but adjacent seating is not guaranteed unless first class seat selection was purchased. Groups must not occupy or reserve unbooked seats and must vacate priority seats on request.",
+      "supervision": "Organised groups of children or young people under 16 must be accompanied by at least one responsible adult for every 10 minors. The group organiser is responsible for the conduct and safety of group members throughout the journey.",
+      "conduct": "Groups must keep noise to a considerate level, must not block aisles, doors, or vestibules, and should respect quiet zones (groups are advised not to book seats in quiet-zone carriages). Disruptive groups may be asked to leave the train, and the operator may decline future group bookings.",
+      "boarding": "Large groups should arrive at the platform early and board together in an orderly manner, following directions from platform staff. Allowing extra time prevents delays to the service.",
+      "luggage": "Standard luggage rules apply per passenger (see the luggage section). Groups travelling with bulky equipment should arrange this in advance with customer service."
+    }
   }
 }
