@@ -265,5 +265,44 @@
     },
     "no_show_policy": "Group members who do not travel and were not cancelled in advance are treated as no-shows. No refund is issued for no-shows.",
     "notes": "Group cancellation terms are deliberately stricter than RF001 because bulk-held seats block availability for other passengers. The reference single/return policy is RF001 (normal) / RF002 (express); RF007 overrides those windows for group bookings."
+  },
+  {
+    "policy_id": "RF008",
+    "label": "Operator-Initiated Cancellation – All Networks",
+    "applies_to": {
+      "network_type": "all",
+      "ticket_types": ["single", "return", "day_pass", "monthly_pass"],
+      "condition": "Applies whenever the operator cancels a service for reasons within its control — for example staff strike action, train faults, crew shortages, or operational decisions. This is distinct from delays (see RF005) and from passenger-initiated cancellations (RF001–RF007)."
+    },
+    "refund_rules": [
+      {
+        "rule_id": "RF008_R1",
+        "label": "Full refund, no fee",
+        "condition": "The operator cancels the booked service and the passenger chooses not to travel",
+        "refund_percent": 100,
+        "admin_fee_usd": 0.00,
+        "description": "The full fare for the affected service is refunded with no administration fee. For return tickets, only the cancelled leg is refunded unless both legs are affected. For monthly/season passes, the day(s) of disruption are credited or the pass validity is extended by the equivalent number of days."
+      },
+      {
+        "rule_id": "RF008_R2",
+        "label": "Free rebooking",
+        "condition": "The passenger chooses to travel on an alternative service instead of taking a refund",
+        "refund_percent": 0,
+        "admin_fee_usd": 0.00,
+        "change_fee_usd": 0.00,
+        "description": "The passenger may rebook onto the next available service on the same route at no charge, including a service on a different date, with no change fee and no fare difference for an equivalent fare class. This waives the normal change fee and change deadline."
+      },
+      {
+        "rule_id": "RF008_R3",
+        "label": "Alternative transport reimbursement",
+        "condition": "No reasonable alternative service is available and the passenger must use other transport to complete an essential journey",
+        "compensation": "Reimbursement of reasonable alternative transport costs up to $10.00, in addition to the full refund of the original fare",
+        "how_to_claim": "Submit the claim with receipts via customer service within 28 days of the cancelled travel date",
+        "description": "Mirrors the severe-delay provision in RF005_R3. Applies only when no comparable replacement service is offered within a reasonable time."
+      }
+    ],
+    "automatic_processing": "When the operator cancels a service, affected passengers are notified by email and in-app notification, and a full refund is initiated automatically to the original payment method — passengers do not need to submit a refund request. Free rebooking and alternative-transport reimbursement (RF008_R2 / RF008_R3) must be requested by the passenger.",
+    "exclusions": "Cancellations caused by third-party events outside the operator's control (extreme weather, security incidents, government directives, or passenger-caused incidents) still qualify for a full refund of the unused fare under RF008_R1, but alternative-transport reimbursement (RF008_R3) does not apply to such events.",
+    "notes": "RF008 always overrides the passenger-initiated windows (RF001–RF007) when the cancellation is initiated by the operator: the passenger is never charged an administration fee or change fee for an operator cancellation. Refund processing timing follows refund_processing in the booking rules."
   }
 ]
