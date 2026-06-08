@@ -73,5 +73,27 @@
       "refund_rule": "RF004",
       "notes": "A day pass offers better value than individual single tickets for passengers making 3 or more metro trips in a day. Tap in and out normally at each station."
     }
+  },
+  {
+    "ticket_type": "monthly_pass",
+    "display_name": "National Rail Monthly Pass",
+    "available_on": ["national_rail"],
+    "description": "A season ticket granting unlimited travel between a fixed origin and destination station (and all intermediate stops on that route) for one calendar month. Designed for regular commuters travelling the same route repeatedly. Not valid on metro services.",
+    "national_rail": {
+      "pricing_model": "flat_monthly_fee_per_route",
+      "formula": "monthly_price = single_standard_fare_for_route × 40 (equivalent to roughly 20 return journeys per month). First class passes are priced at single_first_fare_for_route × 40.",
+      "fare_classes": ["standard", "first"],
+      "seat_assignment": false,
+      "unlimited_journeys": true,
+      "valid_route": "Fixed origin–destination pair selected at purchase, including all intermediate stops on that route. Not valid on other routes.",
+      "validity": "One calendar month of unlimited journeys, starting from the selected activation date (00:00 on the start date to 23:59 on the day before the same date the following month).",
+      "advance_purchase": true,
+      "advance_purchase_max_days": 90,
+      "changes_allowed": false,
+      "transferable": false,
+      "refundable": true,
+      "refund_rule": "RF006",
+      "notes": "The monthly pass is non-transferable and tied to the named passenger. Seats are not reserved; pass holders board on a first-come basis like standard single-ticket holders. A monthly pass offers better value than individual tickets for commuters making 20 or more return journeys on the same route per month. Refunds after activation are pro-rated by unused days under RF006."
+    }
   }
 ]
