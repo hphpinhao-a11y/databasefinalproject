@@ -160,6 +160,22 @@
       "admin_fee_note": "Any applicable administration fee (per the relevant refund policy, e.g. RF001, RF002, or RF006) is deducted before the refund is issued. The amount returned is the eligible refund minus the admin fee.",
       "notification": "Passengers receive an email and in-app notification confirming the refund amount and the date it was issued. The booking status is updated to 'cancelled' once the refund is processed.",
       "tracking": "Passengers can check the status of a refund in the app under the relevant booking, using the booking reference."
+    },
+    "lost_property": {
+      "how_to_report": "Passengers who lose an item on a train, on the metro, or at a station should report it as soon as possible via the in-app lost property form, by contacting customer service, or in person at any station help desk. Providing the date, service or line, and a description of the item helps staff locate it.",
+      "where_items_are_held": "Found items are collected by staff and transferred to the central lost property office, usually within 1 to 2 business days of being found. Until then, items may be held at the station where they were handed in.",
+      "collection": "To collect an item, the passenger must attend the central lost property office in person and provide a description of the item and a valid photo ID. High-value items may require proof of ownership before they are released.",
+      "storage_period": {
+        "standard_items": "Items are held for 30 days from the date they are found. Unclaimed items are donated, recycled, or disposed of after this period.",
+        "perishable_items": "Food, drink, and other perishable items are disposed of immediately and are not stored.",
+        "high_value_items": "High-value items (e.g. wallets, passports, electronics) are held for 90 days to give the owner more time to claim them."
+      },
+      "storage_fee": {
+        "fee_usd": 2.00,
+        "description": "A handling and storage fee of $2.00 per item is payable on collection. The fee is waived for essential documents such as passports and ID cards.",
+        "waiver": "No fee is charged if the item is reunited with the passenger on the same day it was found."
+      },
+      "liability": "The operator stores found items as a goodwill service and is not liable for items that are lost, not handed in, or disposed of after the storage period. Passengers are responsible for their own belongings at all times."
     }
   }
 }
