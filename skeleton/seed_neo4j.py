@@ -40,22 +40,98 @@ def seed():
         session.run("MATCH (n) DETACH DELETE n")
         print("  Cleared existing graph data")
 
-        # TODO: Design your node labels and create metro station nodes.
-        # Each station has: station_id, name, lines, and interchange info.
-        # See metro_stations.json for the full data structure.
+        # Metro stations
+        for station in metro_stations:
+            session.run(
+                """
+                CREATE (:MetroStation {
+                    station_id: $station_id,
+                    name: $name
+                })
+                """,
+                station_id=station["station_id"],
+                name=station["name"]
+            )
 
-        # TODO: Design your node labels and create national rail station nodes.
-        # See national_rail_stations.json for the full data structure.
+        print(f"  Created {len(metro_stations)} metro stations")
 
-        # TODO: Design your relationship types and create metro links.
-        # Each station lists its adjacent_stations with line and travel_time_min.
-        # Consider what properties to store on the relationship.
+        # Rail stations
+        for station in rail_stations:
+            session.run(
+                """
+                CREATE (:RailStation {
+                    station_id: $station_id,
+                    name: $name
+                })
+                """,
+                station_id=station["station_id"],
+                name=station["name"]
+            )
 
-        # TODO: Design your relationship types and create national rail links.
+        print(f"  Created {len(rail_stations)} rail stations")
 
-        # TODO: Create interchange relationships between metro and rail stations.
-        # Interchange info is in the is_interchange_national_rail field
-        # of metro_stations.json.
+        # Metro connections
+        for station in metro_stations:
+            for adjacent in station["adjacent_stations"]:
+
+                session.run(
+                    """
+                    MATCH (a:MetroStation {station_id:$from_id})
+                    MATCH (b:MetroStation {station_id:$to_id})
+
+                    CREATE (a)-[:CONNECTS_TO {
+                        line:$line,
+                        travel_time_min:$travel_time
+                    }]->(b)
+                    """,
+                    from_id=station["station_id"],
+                    to_id=adjacent["station_id"],
+                    line=adjacent["line"],
+                    travel_time=adjacent["travel_time_min"]
+                )
+
+        print("  Created metro connections")
+
+        # Rail connections
+        for station in rail_stations:
+            for adjacent in station["adjacent_stations"]:
+
+                session.run(
+                    """
+                    MATCH (a:RailStation {station_id:$from_id})
+                    MATCH (b:RailStation {station_id:$to_id})
+
+                    CREATE (a)-[:CONNECTS_TO {
+                        line:$line,
+                        travel_time_min:$travel_time
+                    }]->(b)
+                    """,
+                    from_id=station["station_id"],
+                    to_id=adjacent["station_id"],
+                    line=adjacent["line"],
+                    travel_time=adjacent["travel_time_min"]
+                )
+
+        print("  Created rail connections")
+
+        # Interchanges
+        for station in metro_stations:
+
+            if station["is_interchange_national_rail"]:
+
+                session.run(
+                    """
+                    MATCH (m:MetroStation {station_id:$metro_id})
+                    MATCH (r:RailStation {station_id:$rail_id})
+
+                    CREATE (m)-[:INTERCHANGE]->(r)
+                    CREATE (r)-[:INTERCHANGE]->(m)
+                    """,
+                    metro_id=station["station_id"],
+                    rail_id=station["interchange_national_rail_station_id"]
+                )
+
+        print("  Created interchange links")
 
     driver.close()
     print("\nNeo4j graph seeded successfully.")
