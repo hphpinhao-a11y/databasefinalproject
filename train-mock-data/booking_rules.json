@@ -148,6 +148,18 @@
     "fraud": "Use of another person's ticket, presentation of a counterfeit ticket, or deliberate fare evasion may result in a penalty fare, removal from the service, and/or legal action.",
     "lost_tickets": "Digital tickets can be retrieved via the app at any time using the booking reference. Passengers are advised to screenshot their QR code before travel in case of connectivity issues.",
     "customer_service": "Passengers with queries or complaints may contact customer service via the in-app chat, email, or station help desks. Response time is within 2 business days.",
-    "dispute_resolution": "If a passenger disagrees with a refund decision, they may escalate the case to the customer service team within 14 days of the original decision."
+    "dispute_resolution": "If a passenger disagrees with a refund decision, they may escalate the case to the customer service team within 14 days of the original decision.",
+    "refund_processing": {
+      "refund_method": "Approved refunds are always returned to the original payment method used for the booking (the same credit card, debit card, or ewallet). Refunds cannot be paid to a different card, account, or as cash.",
+      "processing_time": "Once a refund is approved, it is processed within 5 to 10 business days. The exact time for the amount to appear depends on the passenger's bank or ewallet provider.",
+      "by_payment_method": {
+        "credit_card": "Typically 5–10 business days to appear on the card statement.",
+        "debit_card": "Typically 5–10 business days, depending on the issuing bank.",
+        "ewallet": "Usually faster, often within 1–3 business days."
+      },
+      "admin_fee_note": "Any applicable administration fee (per the relevant refund policy, e.g. RF001, RF002, or RF006) is deducted before the refund is issued. The amount returned is the eligible refund minus the admin fee.",
+      "notification": "Passengers receive an email and in-app notification confirming the refund amount and the date it was issued. The booking status is updated to 'cancelled' once the refund is processed.",
+      "tracking": "Passengers can check the status of a refund in the app under the relevant booking, using the booking reference."
+    }
   }
 }
