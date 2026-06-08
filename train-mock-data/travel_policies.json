@@ -37,6 +37,24 @@
       "exceptions": "Guide dogs and registered assistance animals are permitted at all times without a carrier.",
       "prohibited": "Dogs not in carriers are not permitted on the metro, including on leads."
     },
+    "prams_pushchairs": {
+      "permitted": true,
+      "fee": 0.00,
+      "folded": {
+        "peak_hour_restriction": false,
+        "description": "Folded prams and pushchairs are permitted on the metro at all times, including peak hours. A folded pram should be kept with the passenger and must not block aisles or doors."
+      },
+      "unfolded": {
+        "permitted": true,
+        "peak_hour_restriction": true,
+        "peak_hours": "07:00–09:30 and 17:00–20:00, Monday to Friday",
+        "peak_hour_rule": "Unfolded prams and pushchairs are discouraged during peak hours due to crowding. During peak hours passengers may be asked to fold the pram if space is limited.",
+        "description": "Outside peak hours, an unfolded pram may be used. It must be positioned in the wheelchair and buggy space or at the ends of the carriage, and must not block aisles or doors."
+      },
+      "priority_space": "The designated wheelchair and buggy space takes priority for wheelchair users. If a wheelchair user needs the space, a passenger with a pram must fold it or move to make room.",
+      "safety": "Passengers must keep hold of the pram at all times and apply the brakes when stationary. Children should be secured in the pram while on board.",
+      "child_fare_note": "A child travelling in a pram who is under 5 years of age travels free; no separate ticket is required for the pram itself."
+    },
     "food_and_drink": {
       "sealed_drinks": "permitted",
       "hot_food": "not permitted",
