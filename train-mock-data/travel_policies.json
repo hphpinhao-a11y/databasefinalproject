@@ -122,6 +122,16 @@
       },
       "large_animals": "Not permitted (except registered assistance animals)."
     },
+    "prams_pushchairs": {
+      "permitted": true,
+      "fee": 0.00,
+      "folded_and_unfolded": "Both folded and unfolded prams and pushchairs are permitted on national rail services at all times, including peak hours. There is no peak-hour restriction for prams on national rail.",
+      "placement": "Unfolded prams should be placed in the designated wheelchair and buggy area or in the luggage space at the ends of the carriage. They must not block aisles, doors, or vestibules. If no dedicated space is available, the pram should be folded and stored like luggage.",
+      "designated_area": "Each train has a designated wheelchair and buggy space, marked with a pram/wheelchair symbol. This space gives priority to wheelchair users; if a wheelchair user boards, a passenger with a pram should fold it or move to free the space.",
+      "safety": "Passengers must keep hold of the pram, apply the brakes when stationary, and keep children secured while on board.",
+      "assistance": "Passengers travelling with a pram who need help boarding may request assistance from platform staff, ideally at least 24 hours before travel (see accessibility).",
+      "child_fare_note": "A child travelling in a pram who is under 5 years of age travels free; no separate ticket is required for the pram."
+    },
     "food_and_drink": {
       "general": "Food and drink are permitted in all coaches.",
       "trolley_service": "A refreshment trolley operates on selected services. Check the service schedule for availability.",
