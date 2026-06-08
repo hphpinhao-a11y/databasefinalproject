@@ -124,8 +124,13 @@ def seed():
                     MATCH (m:MetroStation {station_id:$metro_id})
                     MATCH (r:RailStation {station_id:$rail_id})
 
-                    CREATE (m)-[:INTERCHANGE]->(r)
-                    CREATE (r)-[:INTERCHANGE]->(m)
+                    CREATE (m)-[:INTERCHANGE {
+                        travel_time_min: 5
+                    }]->(r)
+
+                    CREATE (r)-[:INTERCHANGE {
+                        travel_time_min: 5
+                    }]->(m)
                     """,
                     metro_id=station["station_id"],
                     rail_id=station["interchange_national_rail_station_id"]

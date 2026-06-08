@@ -55,20 +55,49 @@ def query_shortest_route(
     destination_id: str,
     network: str = "auto",
 ) -> dict:
-    """
-    Find the fastest path between two stations, minimising total travel time.
-    Uses apoc.algo.dijkstra (APOC required; enabled in docker-compose.yml).
+    with _driver() as driver:
+        with driver.session() as session:
 
-    Args:
-        origin_id:       e.g. "MS01" or "NR01"
-        destination_id:  e.g. "MS09" or "NR05"
-        network:         "metro", "rail", or "auto" (inferred from IDs)
+            result = session.run(
+                """
+                MATCH (start {station_id:$origin_id})
+                MATCH (end {station_id:$destination_id})
 
-    Returns:
-        dict with keys: found, origin_id, destination_id,
-                        total_time_min, path (list of station dicts), legs
-    """
-    raise NotImplementedError("TODO: implement after designing your graph schema")
+                CALL apoc.algo.dijkstra(
+                    start,
+                    end,
+                    "CONNECTS_TO|INTERCHANGE",
+                    "travel_time_min"
+                )
+                YIELD path, weight
+
+                RETURN path, weight
+                """,
+                origin_id=origin_id,
+                destination_id=destination_id
+            )
+
+            record = result.single()
+
+            if not record:
+                return {
+                    "found": False,
+                    "path": []
+                }
+
+            stations = []
+
+            for node in record["path"].nodes:
+                stations.append({
+                    "station_id": node["station_id"],
+                    "name": node["name"]
+                })
+
+            return {
+                "found": True,
+                "total_time_min": record["weight"],
+                "path": stations
+            }
 
 
 # ── CHEAPEST ROUTE (Dijkstra by fare) ────────────────────────────────────────
@@ -79,19 +108,29 @@ def query_cheapest_route(
     network: str = "auto",
     fare_class: str = "standard",
 ) -> dict:
-    """
-    Find the cheapest path between two stations, minimising total estimated fare.
 
-    Args:
-        origin_id:       e.g. "NR01"
-        destination_id:  e.g. "NR05"
-        network:         "metro", "rail", or "auto"
-        fare_class:      "standard" or "first" (national rail only)
+    result = query_shortest_route(
+        origin_id,
+        destination_id,
+        network
+    )
 
-    Returns:
-        dict with found, total_fare_usd (approximate), stations, legs
-    """
-    raise NotImplementedError("TODO: implement after designing your graph schema")
+    if not result["found"]:
+        return {
+            "found": False,
+            "path": []
+        }
+
+    stops = max(len(result["path"]) - 1, 0)
+
+    multiplier = 2.0 if fare_class == "first" else 1.5
+
+    result["total_fare_usd"] = round(
+        stops * multiplier,
+        2
+    )
+
+    return result
 
 
 # ── ALTERNATIVE ROUTES (avoiding a station) ───────────────────────────────────
@@ -103,38 +142,99 @@ def query_alternative_routes(
     network: str = "auto",
     max_routes: int = 3,
 ) -> list[list[dict]]:
-    """
-    Find paths between two stations that avoid a specific intermediate station.
-    Useful for routing around a delayed or closed station.
+    with _driver() as driver:
+        with driver.session() as session:
 
-    Args:
-        origin_id:         e.g. "NR01"
-        destination_id:    e.g. "NR05"
-        avoid_station_id:  e.g. "NR03"
-        network:           "metro", "rail", or "auto"
-        max_routes:        max number of alternatives to return
+            result = session.run(
+                """
+                MATCH (start {station_id:$origin_id})
+                MATCH (end {station_id:$destination_id})
 
-    Returns:
-        List of routes, each route is a list of leg dicts
-    """
-    raise NotImplementedError("TODO: implement after designing your graph schema")
+                MATCH p = shortestPath(
+                    (start)-[:CONNECTS_TO|INTERCHANGE*]-(end)
+                )
+
+                WHERE NONE(
+                    node IN nodes(p)
+                    WHERE node.station_id = $avoid_station_id
+                )
+
+                RETURN p
+
+                LIMIT $max_routes
+                """,
+                origin_id=origin_id,
+                destination_id=destination_id,
+                avoid_station_id=avoid_station_id,
+                max_routes=max_routes
+            )
+
+            routes = []
+
+            for record in result:
+
+                path = record["p"]
+
+                stations = []
+
+                for node in path.nodes:
+                    stations.append({
+                        "station_id": node["station_id"],
+                        "name": node["name"]
+                    })
+
+                routes.append(stations)
+
+            return routes
 
 
 # ── CROSS-NETWORK INTERCHANGE PATH ───────────────────────────────────────────
 
-def query_interchange_path(origin_id: str, destination_id: str) -> dict:
-    """
-    Find a path between a metro station and a national rail station (or vice versa)
-    crossing the network boundary via interchange relationships.
+def query_interchange_path(
+    origin_id: str,
+    destination_id: str
+) -> dict:
 
-    Args:
-        origin_id:       e.g. "MS03" (metro) or "NR05" (national rail)
-        destination_id:  e.g. "NR05" (national rail) or "MS09" (metro)
+    with _driver() as driver:
+        with driver.session() as session:
 
-    Returns:
-        dict with found, stations list, interchange points, total_time_min
-    """
-    raise NotImplementedError("TODO: implement after designing your graph schema")
+            result = session.run(
+                """
+                MATCH (start {station_id:$origin_id})
+                MATCH (end {station_id:$destination_id})
+
+                MATCH p = shortestPath(
+                    (start)-[:CONNECTS_TO|INTERCHANGE*]-(end)
+                )
+
+                RETURN p
+                """,
+                origin_id=origin_id,
+                destination_id=destination_id
+            )
+
+            record = result.single()
+
+            if not record:
+                return {
+                    "found": False,
+                    "path": []
+                }
+
+            path = record["p"]
+
+            stations = []
+
+            for node in path.nodes:
+                stations.append({
+                    "station_id": node["station_id"],
+                    "name": node["name"]
+                })
+
+            return {
+                "found": True,
+                "path": stations
+            }
 
 
 # ── DELAY RIPPLE ANALYSIS ─────────────────────────────────────────────────────
