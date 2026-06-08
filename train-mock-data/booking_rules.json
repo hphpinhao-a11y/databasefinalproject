@@ -117,6 +117,20 @@
       "available": false,
       "description": "Group discounts are not available on metro services."
     },
+    "contactless_payment": {
+      "available": true,
+      "description": "Passengers may pay for metro travel by tapping a contactless bank card or a linked device (phone/smartwatch ewallet) directly at the station gate, without buying a ticket in advance. Each tap-in and tap-out is recorded, and the fare is calculated automatically from the journey taken.",
+      "fare_calculation": "Pay-as-you-go fares use the same stops-based formula as a single ticket: base_fare_usd + (stops_travelled × per_stop_rate_usd). The passenger must tap in at the origin and tap out at the destination so the system can calculate the correct fare.",
+      "daily_cap": {
+        "enabled": true,
+        "cap_amount_usd": 5.00,
+        "description": "Total contactless charges for metro travel within a single calendar day (00:00–23:59) are capped at $5.00, which is equal to the price of a Metro Day Pass. Once a passenger's accumulated pay-as-you-go fares for the day reach the cap, all further metro journeys that day are free.",
+        "rule": "The daily cap is applied automatically — the passenger does not need to buy a day pass to benefit. The system never charges more than the cap for one day of metro travel."
+      },
+      "automatic_best_fare": "The system automatically charges the lowest applicable price across the day: individual stops-based fares until the total would exceed the daily cap, after which the cap amount applies instead. Passengers always pay the cheaper of (sum of individual journeys) or (the daily cap).",
+      "incomplete_journey": "If a passenger taps in but does not tap out, a maximum journey fare may be charged because the destination cannot be determined. Passengers should always tap out to ensure the correct, lower fare is applied.",
+      "same_card_rule": "The same physical card or device must be used to tap in and tap out for a journey. Daily capping only aggregates taps made with the same card or device."
+    },
     "payment": {
       "accepted_methods": ["credit_card", "debit_card", "ewallet"],
       "payment_timing": "Full payment is required at the time of purchase.",
