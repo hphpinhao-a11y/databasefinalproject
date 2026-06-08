@@ -50,6 +50,30 @@
       "conditions": "Group discount applies to standard class single and return tickets only. All group members must travel on the same service. Discount is applied at the time of booking when 10 or more tickets are purchased in a single transaction.",
       "not_applicable": "Group discount does not apply to first class tickets, express services, or day passes."
     },
+    "railcards": {
+      "description": "Discount railcards reduce the applicable adult fare for eligible passengers on national rail services. A railcard must be linked to the passenger account at the time of booking, and the discount is applied automatically to qualifying fares.",
+      "applicable_class": "standard",
+      "applicable_fares": "Standard class single and return tickets. Railcard discounts do not stack with group discounts; the larger single discount applies.",
+      "student_railcard": {
+        "discount_percent": 30,
+        "eligibility": "Full-time students aged 16 and over enrolled at a recognised educational institution.",
+        "proof_required": "A valid student ID card or enrolment letter from the institution, plus a photo ID matching the name on the booking. Proof may be requested at booking and on board.",
+        "validity": "Railcard is valid for 12 months from issue and must be renewed with updated proof of enrolment."
+      },
+      "senior_railcard": {
+        "discount_percent": 30,
+        "eligibility": "Passengers aged 65 and over.",
+        "proof_required": "A valid photo ID showing date of birth (national ID card, passport, or driving licence). Proof may be requested at booking and on board.",
+        "validity": "Railcard is valid for 12 months from issue and is renewable."
+      },
+      "disabled_railcard": {
+        "discount_percent": 50,
+        "eligibility": "Passengers with a registered disability. A companion travelling with the cardholder also receives the same 50% discount on their ticket.",
+        "proof_required": "A valid disability registration document or government-issued disability card, plus a photo ID matching the name on the booking. Proof may be requested at booking and on board.",
+        "validity": "Railcard is valid for the period stated on the disability registration, up to a maximum of 12 months, and is renewable with updated proof."
+      },
+      "general_conditions": "Only one railcard discount may be applied per ticket. Railcard discounts apply to standard class only and are not available on express services or first class fares. A passenger travelling on a discounted railcard fare without valid proof when requested may be charged the full undiscounted fare and a penalty fare."
+    },
     "payment": {
       "accepted_methods": ["credit_card", "debit_card", "ewallet"],
       "payment_timing": "Full payment is required at the time of booking.",
