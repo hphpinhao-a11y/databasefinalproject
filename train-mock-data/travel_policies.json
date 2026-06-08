@@ -74,7 +74,22 @@
       "Items emitting strong odours that may cause discomfort to other passengers"
     ],
     "smoking_and_vaping": "Strictly prohibited on all metro carriages, platforms, and station concourses.",
-    "noise": "Passengers are asked to keep noise to a considerate level. Use of personal audio devices with external speakers is not permitted."
+    "noise": "Passengers are asked to keep noise to a considerate level. Use of personal audio devices with external speakers is not permitted.",
+    "wifi_connectivity": {
+      "onboard_wifi": {
+        "available": false,
+        "description": "There is no Wi-Fi on board metro trains. Because journeys are short and trains run frequently underground, onboard Wi-Fi is not provided."
+      },
+      "station_wifi": {
+        "available": true,
+        "fee": 0.00,
+        "network_name": "TransitFlow_Free_WiFi",
+        "description": "Free Wi-Fi is available at all metro stations on the concourse and platform level. Connect to the 'TransitFlow_Free_WiFi' network; no password is required, though a one-time sign-in page may be shown.",
+        "coverage": "Coverage is limited to station areas and may drop once the train enters the tunnel."
+      },
+      "mobile_signal": "Mobile data signal is available at most stations but may be intermittent in tunnels between stations.",
+      "power_sockets": "Power sockets and USB charging points are not available on metro trains or at stations."
+    }
   },
   "national_rail": {
     "bicycles": {
