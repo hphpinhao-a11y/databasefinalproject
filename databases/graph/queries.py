@@ -277,20 +277,20 @@ def query_delay_ripple(
     with _driver() as driver:
         with driver.session() as session:
 
+            # *0..{hops} includes the zero-length path, so the delayed station
+            # itself is returned with hops_away = 0. min(length(p)) collapses
+            # each reachable station to a single row at its shortest hop
+            # distance (instead of one row per path length).
             result = session.run(
                 f"""
-                MATCH (s {{station_id:$station_id}})
+                MATCH p=(s {{station_id:$station_id}})-[:CONNECTS_TO*0..{hops}]->(n)
 
-                MATCH p=(s)-[:CONNECTS_TO*1..{hops}]->(n)
-
-                WHERE n.station_id <> $station_id
-
-                RETURN DISTINCT
+                RETURN
                     n.station_id AS station_id,
                     n.name AS name,
-                    length(p) AS hops_away
+                    min(length(p)) AS hops_away
 
-                ORDER BY hops_away
+                ORDER BY hops_away, station_id
                 """,
                 station_id=delayed_station_id
             )
