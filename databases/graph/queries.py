@@ -66,7 +66,7 @@ def query_shortest_route(
                 CALL apoc.algo.dijkstra(
                     start,
                     end,
-                    "CONNECTS_TO|INTERCHANGE",
+                    "CONNECTS_TO|INTERCHANGE_TO",
                     "travel_time_min"
                 )
                 YIELD path, weight
@@ -150,7 +150,7 @@ def query_alternative_routes(
     # alternatives. Instead we use apoc.path.expandConfig with
     # uniqueness 'NODE_PATH', which enumerates simple paths (no node repeated
     # within a path) and prunes during expansion, so it stays tractable:
-    #   - relationshipFilter walks CONNECTS_TO / INTERCHANGE in BOTH directions
+    #   - relationshipFilter walks CONNECTS_TO / INTERCHANGE_TO in BOTH directions
     #     (CONNECTS_TO is stored one-way by the seeder, so undirected traversal
     #     is required to find every route)
     #   - terminatorNodes stops each path at the destination
@@ -170,7 +170,7 @@ def query_alternative_routes(
                 OPTIONAL MATCH (avoid {station_id:$avoid_station_id})
 
                 CALL apoc.path.expandConfig(start, {
-                    relationshipFilter: 'CONNECTS_TO|INTERCHANGE',
+                    relationshipFilter: 'CONNECTS_TO|INTERCHANGE_TO',
                     terminatorNodes: [end],
                     blacklistNodes: CASE
                         WHEN avoid IS NULL THEN []
@@ -234,7 +234,7 @@ def query_interchange_path(
                 MATCH (end {station_id:$destination_id})
 
                 MATCH p = shortestPath(
-                    (start)-[:CONNECTS_TO|INTERCHANGE*]-(end)
+                    (start)-[:CONNECTS_TO|INTERCHANGE_TO*]-(end)
                 )
 
                 RETURN p
