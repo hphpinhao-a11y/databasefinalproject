@@ -142,6 +142,24 @@ def query_alternative_routes(
     network: str = "auto",
     max_routes: int = 3,
 ) -> list[list[dict]]:
+    # Enumerate MULTIPLE distinct routes from origin to destination that do NOT
+    # pass through avoid_station, ranked by total travel_time_min (ascending),
+    # returning at most max_routes of them.
+    #
+    # shortestPath only ever yields a single path, so it cannot produce real
+    # alternatives. Instead we use apoc.path.expandConfig with
+    # uniqueness 'NODE_PATH', which enumerates simple paths (no node repeated
+    # within a path) and prunes during expansion, so it stays tractable:
+    #   - relationshipFilter walks CONNECTS_TO / INTERCHANGE in BOTH directions
+    #     (CONNECTS_TO is stored one-way by the seeder, so undirected traversal
+    #     is required to find every route)
+    #   - terminatorNodes stops each path at the destination
+    #   - blacklistNodes drops any path going through the avoided station
+    #   - maxLevel caps path length
+    # We then sum travel_time_min over each path's relationships, order by that
+    # total, and keep the cheapest max_routes paths.
+    MAX_HOPS = 20  # upper bound on path length (graph has 30 stations)
+
     with _driver() as driver:
         with driver.session() as session:
 
@@ -149,23 +167,35 @@ def query_alternative_routes(
                 """
                 MATCH (start {station_id:$origin_id})
                 MATCH (end {station_id:$destination_id})
+                OPTIONAL MATCH (avoid {station_id:$avoid_station_id})
 
-                MATCH p = shortestPath(
-                    (start)-[:CONNECTS_TO|INTERCHANGE*]-(end)
-                )
+                CALL apoc.path.expandConfig(start, {
+                    relationshipFilter: 'CONNECTS_TO|INTERCHANGE',
+                    terminatorNodes: [end],
+                    blacklistNodes: CASE
+                        WHEN avoid IS NULL THEN []
+                        ELSE [avoid]
+                    END,
+                    uniqueness: 'NODE_PATH',
+                    maxLevel: $max_hops
+                }) YIELD path
 
-                WHERE NONE(
-                    node IN nodes(p)
-                    WHERE node.station_id = $avoid_station_id
-                )
+                WITH path,
+                     reduce(
+                         t = 0,
+                         r IN relationships(path) | t + r.travel_time_min
+                     ) AS total_time
 
-                RETURN p
+                ORDER BY total_time ASC
 
                 LIMIT $max_routes
+
+                RETURN path
                 """,
                 origin_id=origin_id,
                 destination_id=destination_id,
                 avoid_station_id=avoid_station_id,
+                max_hops=MAX_HOPS,
                 max_routes=max_routes
             )
 
@@ -173,7 +203,7 @@ def query_alternative_routes(
 
             for record in result:
 
-                path = record["p"]
+                path = record["path"]
 
                 stations = []
 
