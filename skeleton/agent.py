@@ -363,8 +363,8 @@ def _execute_tool(
                 origin_station_id=params["origin_station_id"],
                 destination_station_id=params["destination_station_id"],
                 travel_date=params["travel_date"],
-                fare_class=params["fare_class"],
-                seat_id=params["seat_id"],
+                fare_class=params.get("fare_class","standard"),
+                seat_id=params.get("seat_id", "any"),
                 ticket_type=params.get("ticket_type", "single"),
             )
             result = data if ok else {"error": data}
@@ -683,6 +683,66 @@ JSON:"""
                 _params["travel_date"] = _travel_date
             _tool = "check_national_rail_availability" if o.startswith("NR") else "check_metro_availability"
             _fallback(_tool, _params, "availability query")
+
+    # 3. Booking request fallback
+    if current_user_email and not tool_calls:
+
+        _booking_triggers = {
+            "book",
+            "booking",
+            "reserve",
+            "reservation"
+        }
+
+        if any(kw in _lower for kw in _booking_triggers):
+
+            _schedule_match = re.search(
+                r"(NR_SCH\d+)",
+                user_message,
+                re.IGNORECASE
+            )
+
+            _travel_date = next(
+                (
+                    w
+                    for w in _lower.split()
+                    if re.match(r"\d{4}-\d{2}-\d{2}", w)
+                ),
+                None
+            )
+
+            if (
+                _schedule_match
+                and len(_station_ids) >= 2
+                and _travel_date
+            ):
+
+                _fallback(
+                    "make_booking",
+                    {
+                        "schedule_id":
+                            _schedule_match.group(1).upper(),
+
+                        "origin_station_id":
+                            _station_ids[0].upper(),
+
+                        "destination_station_id":
+                            _station_ids[1].upper(),
+
+                        "travel_date":
+                            _travel_date,
+
+                        "fare_class":
+                            "standard",
+
+                        "seat_id":
+                            "any",
+
+                        "ticket_type":
+                            "single"
+                    },
+                    "booking request"
+                )
 
     # 3. Personal booking history — requires login
     if current_user_email and not tool_calls:

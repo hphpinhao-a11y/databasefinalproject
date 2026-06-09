@@ -914,10 +914,22 @@ def login_user(
             if calculated_hash != stored_hash:
                 return None
 
+            name_parts = full_name.split(" ", 1)
+
+            first_name = name_parts[0]
+
+            surname = (
+                name_parts[1]
+                if len(name_parts) > 1
+                else ""
+            )
+
             return {
                 "user_id": user_id,
                 "email": email_db,
                 "full_name": full_name,
+                "first_name": first_name,
+                "surname": surname,
                 "phone": phone,
                 "date_of_birth": date_of_birth,
                 "is_active": is_active
